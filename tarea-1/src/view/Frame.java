@@ -42,6 +42,7 @@ public class Frame extends JFrame {
     }
 
     private void showIntro() {
+        lTitle.setText("Menú principal");
         if (p1 == null) {
             p1 = new JPanel();
             p1.setLayout(null);
@@ -81,8 +82,7 @@ public class Frame extends JFrame {
             bExecute.addActionListener(e -> {
                 if (!hayDatos()) {
                     showDatos();
-                }
-                else {
+                } else {
                     // add modify option here
                     execute();
                 }
@@ -183,12 +183,45 @@ public class Frame extends JFrame {
     }
 
     private String getAnswer() {
-        switch(cbAlgoritmos.getSelectedIndex()) {
+        String value = "";
+        int option = cbAlgoritmos.getSelectedIndex();
+        if (option == 0) {
+            do{
+                value = JOptionPane.showInputDialog("Inserte la clave que desea buscar");
+                if(value.length()!=4 || !isInt(value) || Integer.parseInt(value)<0) {
+                    JOptionPane.showMessageDialog(null, "Por favor busque una clave numérica entera positiva con cuatro caracteres");
+                }
+                else {
+                    break;
+                }
+            }
+            while (true);
+        }
+        switch (option) {
             case 0:
-                return "Primer algoritmo";
+                return getSecuencial(value);
             default:
                 return "No se ha implementado";
         }
+    }
+
+    private String getSecuencial(String clave) {
+        lTitle.setText("Búsqueda secuencial");
+        for (int i = 0; i < data.size(); i++) {
+            if (data.get(i).equals(clave)) {
+                return "Se encontró la clave " + clave + " en la dirección " + i + " de la estructura"
+                        + getEstructura();
+            }
+        }
+        return "No se encontró la clave " + clave + " en la estructura" + getEstructura();
+    }
+
+    private String getEstructura() {
+        String estructura = "\nEstructura (direccion, clave):\n";
+        for (int i = 0; i < data.size(); i++) {
+            estructura += "(" + i + ", " + data.get(i) + "), ";
+        }
+        return estructura;
     }
 
     private void loadJLabels() {
