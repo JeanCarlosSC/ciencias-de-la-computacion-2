@@ -19,6 +19,8 @@ public class Frame extends JFrame {
     JPanel pContent;
     JPanel p1, p2, p3;
     ArrayList<String> data;
+    ArrayList<Integer> dirData;
+
     Font text = new Font("Arial", Font.PLAIN, 20);
     JComboBox cbAlgoritmos;
 
@@ -207,9 +209,15 @@ public class Frame extends JFrame {
 
     private String getSecuencial(String clave) {
         lTitle.setText("Búsqueda secuencial");
+        dirData = new ArrayList<Integer>();
+        for (String str : data) {
+            int aux = Integer.parseInt(str);
+            int k = aux % 1000 + 1;
+            dirData.add(k);
+        }
         for (int i = 0; i < data.size(); i++) {
             if (data.get(i).equals(clave)) {
-                return "Se encontró la clave " + clave + " en la dirección " + i + " de la estructura"
+                return "Se encontró la clave " + clave + " en la dirección " + dirData.get(i) + " de la estructura"
                         + getEstructura();
             }
         }
@@ -219,7 +227,7 @@ public class Frame extends JFrame {
     private String getEstructura() {
         String estructura = "\nEstructura (direccion, clave):\n";
         for (int i = 0; i < data.size(); i++) {
-            estructura += "(" + i + ", " + data.get(i) + "), ";
+            estructura += "(" + dirData.get(i) + ", " + data.get(i) + "), ";
         }
         return estructura;
     }
