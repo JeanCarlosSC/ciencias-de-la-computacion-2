@@ -2,7 +2,13 @@ package view;
 
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.RenderingHints.Key;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.Vector;
 
 import javax.swing.JButton;
@@ -15,11 +21,13 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
 public class Frame extends JFrame {
+    int n = 100;
+    int digitos = 4;
+
     JLabel lTitle;
     JPanel pContent;
     JPanel p1, p2, p3;
     ArrayList<String> data;
-    ArrayList<Integer> dirData;
 
     Font text = new Font("Arial", Font.PLAIN, 20);
     JComboBox cbAlgoritmos;
@@ -58,26 +66,30 @@ public class Frame extends JFrame {
             p1.add(lP1);
 
             Vector options = new Vector<>();
-            options.addElement("Búsqueda secuencial");
-            options.addElement("Búsqueda binaria");
-            options.addElement("Búsqueda HASH: Función módulo");
-            options.addElement("Búsqueda HASH: Función cuadrada");
-            options.addElement("Búsqueda HASH: Función plegamiento");
-            options.addElement("Búsqueda HASH: Función truncamiento");
-            options.addElement("Búsqueda HASH: Función transformación de bases");
-            options.addElement("Búsqueda por residuos: Árboles digitales");
-            options.addElement("Búsqueda por residuos: Residuos");
-            options.addElement("Búsqueda por residuos: Residuos múltiples");
-            options.addElement("Búsqueda por residuos: Árboles de Huffman");
-            options.addElement("Búsqueda dinámica: Expansión total");
-            options.addElement("Búsqueda dinámica: Expansión parcial");
-            options.addElement("Búsqueda dinámica: Reducción total");
-            options.addElement("Búsqueda dinámica: Reducción parcial");
+            options.addElement("Búsqueda interna: Secuencial");
+            options.addElement("Búsqueda interna Binaria");
+            options.addElement("Búsqueda interna HASH: Función módulo");
+            options.addElement("Búsqueda interna HASH: Función cuadrada");
+            options.addElement("Búsqueda interna HASH: Función plegamiento");
+            options.addElement("Búsqueda interna HASH: Función truncamiento");
+            options.addElement("Búsqueda externa HASH: Función transformación de bases");
+            options.addElement("Búsqueda externa: Secuencial");
+            options.addElement("Búsqueda externa: Binaria");
+            options.addElement("Búsqueda externa HASH: Función cuadrada");
+            options.addElement("Búsqueda externa HASH: Función plegamiento");
+            options.addElement("Búsqueda externa HASH: Función truncamiento");
+            options.addElement("Búsqueda externa HASH: Función módulo");
 
             cbAlgoritmos = new JComboBox<>(options);
             cbAlgoritmos.setBounds(64, 80, 700, 40);
             cbAlgoritmos.setFont(text);
             p1.add(cbAlgoritmos);
+
+            JButton bInsert = new JButton("Insertar datos");
+            bInsert.setBounds(350, 150, 200, 32);
+            bInsert.setFont(text);
+            bInsert.addActionListener(e1 -> showDatos());
+            p1.add(bInsert);
 
             JButton bExecute = new JButton("Ejecutar");
             bExecute.setBounds(600, 150, 150, 32);
@@ -104,7 +116,7 @@ public class Frame extends JFrame {
             p2.setLayout(null);
             p2.setBounds(0, 0, 850, 500);
 
-            JLabel lP1 = new JLabel("Ingrese clave (4 caracteres numéricos)");
+            JLabel lP1 = new JLabel("Ingrese clave (" + digitos + " caracteres numéricos)");
             lP1.setBounds(32, 32, 400, 30);
             lP1.setFont(text);
             p2.add(lP1);
@@ -127,6 +139,7 @@ public class Frame extends JFrame {
                 insertar(tValue.getText());
                 tClaves.setText(getDataToString());
                 tClaves.repaint();
+                tValue.setText("");
                 p2.repaint();
             });
             bInsertar.setFont(text);
@@ -187,37 +200,256 @@ public class Frame extends JFrame {
     private String getAnswer() {
         String value = "";
         int option = cbAlgoritmos.getSelectedIndex();
-        if (option == 0) {
-            do{
-                value = JOptionPane.showInputDialog("Inserte la clave que desea buscar");
-                if(value.length()!=4 || !isInt(value) || Integer.parseInt(value)<0) {
-                    JOptionPane.showMessageDialog(null, "Por favor busque una clave numérica entera positiva con cuatro caracteres");
-                }
-                else {
-                    break;
-                }
+        do {
+            value = JOptionPane.showInputDialog("Inserte la clave que desea buscar");
+            if (value != null && (value.length() != digitos || !isInt(value) || Integer.parseInt(value) < 0)) {
+                JOptionPane.showMessageDialog(null,
+                        "Por favor busque una clave numérica entera positiva con " + digitos + " caracteres");
+            } else {
+                break;
             }
-            while (true);
-        }
+        } while (true);
         switch (option) {
             case 0:
-                return getSecuencial(value);
+                return getInternoSecuencial(value);
+            case 1:
+                return getInternoBinario(value);
+            case 2:
+                return getInternoMod(value);
+            case 3:
+                return getInternoCuadrado(value);
+            case 4:
+                return getInternoPlegamiento(value);
+            case 5:
+                return getInternoTruncamiento(value);
+            case 6:
+                return getInternoTransBases(value);
+            case 7:
+                return getExtSecuencial(value);
+            case 8:
+                return getExtBinario(value);
+            case 9:
+                return getExtCuadrado(value);
+            case 10:
+                return getExtPlegamiento(value);
+            case 11:
+                return getExtTruncamiento(value);
+            case 12:
+                return getExtMod(value);
             default:
                 return "No se ha implementado";
         }
     }
 
-    private String getSecuencial(String clave) {
-        lTitle.setText("Búsqueda secuencial");
-        dirData = new ArrayList<Integer>();
-        for (String str : data) {
-            int aux = Integer.parseInt(str);
-            int k = aux % 1000 + 1;
-            dirData.add(k);
+    private String getExtMod(String clave) {
+        lTitle.setText("Búsqueda externa HASH: F. módulo");
+        int ans = bInternoBinario(Integer.parseInt(clave));
+        if (ans < 0) {
+            return "No se encontró la clave " + clave + " en la estructura" + getEstructura();
+        } else {
+            return "Se encontró la clave " + clave + " en la dirección " + hashMod(Integer.parseInt(clave))
+                    + " de la estructura"
+                    + getEstructura();
         }
+    }
+
+    private String getExtTruncamiento(String clave) {
+        lTitle.setText("Búsqueda externa HASH: F. Truncamiento");
+        int ans = bInternoBinario(Integer.parseInt(clave));
+        if (ans < 0) {
+            return "No se encontró la clave " + clave + " en la estructura" + getEstructura();
+        } else {
+            return "Se encontró la clave " + clave + " en la dirección " + hashTruncamiento(Integer.parseInt(clave))
+                    + " de la estructura"
+                    + getEstructura();
+        }
+    }
+
+    private String getExtPlegamiento(String clave) {
+        lTitle.setText("Búsqueda externa HASH: F. Plegamiento");
+        int ans = bInternoBinario(Integer.parseInt(clave));
+        if (ans < 0) {
+            return "No se encontró la clave " + clave + " en la estructura" + getEstructura();
+        } else {
+            return "Se encontró la clave " + clave + " en la dirección " + hashPlegamiento(Integer.parseInt(clave))
+                    + " de la estructura"
+                    + getEstructura();
+        }
+    }
+
+    private String getExtCuadrado(String clave) {
+        lTitle.setText("Búsqueda externa HASH: F. cuadrado");
+        int ans = bInternoBinario(Integer.parseInt(clave));
+        if (ans < 0) {
+            return "No se encontró la clave " + clave + " en la estructura" + getEstructura();
+        } else {
+            return "Se encontró la clave " + clave + " en la dirección " + hashCuadrado(Integer.parseInt(clave), 0)
+                    + " de la estructura"
+                    + getEstructura();
+        }
+    }
+
+    private String getExtBinario(String clave) {
+        lTitle.setText("Búsqueda externa HASH: F. Binario");
+        int ans = bInternoBinario(Integer.parseInt(clave));
+        if (ans < 0) {
+            return "No se encontró la clave " + clave + " en la estructura" + getEstructura();
+        } else {
+            return "Se encontró la clave " + clave + " en la dirección " + hashMod(Integer.parseInt(clave))
+                    + " de la estructura"
+                    + getEstructura();
+        }
+    }
+
+    private String getExtSecuencial(String clave) {
+        lTitle.setText("Búsqueda HASH: F. Transformación de bases");
+        int ans = bInternoBinario(Integer.parseInt(clave));
+        if (ans < 0) {
+            return "No se encontró la clave " + clave + " en la estructura" + getEstructura();
+        } else {
+            return "Se encontró la clave " + clave + " en la dirección " + hashMod(Integer.parseInt(clave))
+                    + " de la estructura"
+                    + getEstructura();
+        }
+    }
+
+    private String getInternoTransBases(String clave) {
+        lTitle.setText("Búsqueda HASH: F. Transformación de bases");
+        int ans = bInternoBinario(Integer.parseInt(clave));
+        if (ans < 0) {
+            return "No se encontró la clave " + clave + " en la estructura" + getEstructura();
+        } else {
+            return "Se encontró la clave " + clave + " en la dirección "
+                    + hashTransformacionBases(Integer.parseInt(clave))
+                    + " de la estructura"
+                    + getEstructura();
+        }
+    }
+
+    public int hashTransformacionBases(int valor) {
+        // Convertir el valor a una base diferente (por ejemplo, base 7)
+        String valorBase7 = Integer.toString(valor, 7);
+
+        // Tomar el módulo del valor convertido para obtener el índice
+        int indice = Integer.parseInt(valorBase7) % n;
+
+        return indice;
+
+    }
+
+    private String getInternoTruncamiento(String clave) {
+        lTitle.setText("Búsqueda interna HASH: F. Truncamiento");
+        int ans = bInternoBinario(Integer.parseInt(clave));
+        if (ans < 0) {
+            return "No se encontró la clave " + clave + " en la estructura" + getEstructura();
+        } else {
+            return "Se encontró la clave " + clave + " en la dirección " + hashTruncamiento(Integer.parseInt(clave))
+                    + " de la estructura"
+                    + getEstructura();
+        }
+    }
+
+    public int hashTruncamiento(int valor) {
+        // Tomar los últimos dígitos (por ejemplo, los últimos dos dígitos)
+        int digitos = valor % 100;
+
+        // Tomar el módulo del resultado para obtener el índice
+        int indice = digitos % n;
+
+        return indice;
+    }
+
+    private String getInternoPlegamiento(String clave) {
+        lTitle.setText("Búsqueda interna HASH: F. Plegamiento");
+        int ans = bInternoBinario(Integer.parseInt(clave));
+        if (ans < 0) {
+            return "No se encontró la clave " + clave + " en la estructura" + getEstructura();
+        } else {
+            return "Se encontró la clave " + clave + " en la dirección " + hashPlegamiento(Integer.parseInt(clave))
+                    + " de la estructura"
+                    + getEstructura();
+        }
+    }
+
+    public int hashPlegamiento(int valor) {
+        int sumaPartes = 0;
+        int numero = valor;
+
+        // Dividir el número en partes y sumarlas
+        while (numero > 0) {
+            sumaPartes += numero % 1000;
+            numero /= 1000;
+        }
+
+        // Tomar el módulo del resultado
+        int indice = sumaPartes % n;
+
+        return indice;
+    }
+
+    private String getInternoCuadrado(String clave) {
+        lTitle.setText("Búsqueda interna HASH: F. cuadrado");
+        int ans = bInternoBinario(Integer.parseInt(clave));
+        if (ans < 0) {
+            return "No se encontró la clave " + clave + " en la estructura" + getEstructura();
+        } else {
+            return "Se encontró la clave " + clave + " en la dirección " + hashCuadrado(Integer.parseInt(clave), 0)
+                    + " de la estructura"
+                    + getEstructura();
+        }
+    }
+
+    private int hashCuadrado(int valor, int intento) {
+        int hash1 = valor % n;
+        int hash2 = 1 + (valor % (n - 1)); // Asegura que sea impar para evitar ciclos infinitos
+        int indice = (hash1 + intento * hash2) % n;
+
+        return indice;
+    }
+
+    private String getInternoMod(String clave) {
+        lTitle.setText("Búsqueda interna HASH: F. módulo");
+        int ans = bInternoBinario(Integer.parseInt(clave));
+        if (ans < 0) {
+            return "No se encontró la clave " + clave + " en la estructura" + getEstructura();
+        } else {
+            return "Se encontró la clave " + clave + " en la dirección " + hashMod(Integer.parseInt(clave))
+                    + " de la estructura"
+                    + getEstructura();
+        }
+    }
+
+    private int hashMod(int clave) {
+        return clave % n + 1;
+    }
+
+    private String getInternoBinario(String clave) {
+        lTitle.setText("Búsqueda interna: Binaria");
+        int ans = bInternoBinario(Integer.parseInt(clave));
+        if (ans < 0) {
+            return "No se encontró la clave " + clave + " en la estructura" + getEstructura();
+        } else {
+            return "Se encontró la clave " + clave + " en la dirección " + hashMod(Integer.parseInt(clave))
+                    + " de la estructura"
+                    + getEstructura();
+        }
+    }
+
+    private int bInternoBinario(int clave) {
+        int[] num = new int[data.size()];
+        for (int i = 0; i < data.size(); i++) {
+            num[i] = Integer.parseInt(data.get(i));
+        }
+        Arrays.sort(num);
+        return Arrays.binarySearch(num, clave);
+    }
+
+    private String getInternoSecuencial(String clave) {
+        lTitle.setText("Búsqueda interna: Secuencial");
         for (int i = 0; i < data.size(); i++) {
             if (data.get(i).equals(clave)) {
-                return "Se encontró la clave " + clave + " en la dirección " + dirData.get(i) + " de la estructura"
+                return "Se encontró la clave " + clave + " en la dirección " + hashMod(Integer.parseInt(clave))
+                        + " de la estructura"
                         + getEstructura();
             }
         }
@@ -227,7 +459,19 @@ public class Frame extends JFrame {
     private String getEstructura() {
         String estructura = "\nEstructura (direccion, clave):\n";
         for (int i = 0; i < data.size(); i++) {
-            estructura += "(" + dirData.get(i) + ", " + data.get(i) + "), ";
+            int dir = 0;
+            if (cbAlgoritmos.getSelectedIndex() == 3 || cbAlgoritmos.getSelectedIndex() == 9) {
+                dir = hashCuadrado(Integer.parseInt(data.get(i)), 0);
+            } else if (cbAlgoritmos.getSelectedIndex() == 4 || cbAlgoritmos.getSelectedIndex() == 10) {
+                dir = hashPlegamiento(Integer.parseInt(data.get(i)));
+            } else if (cbAlgoritmos.getSelectedIndex() == 5 || cbAlgoritmos.getSelectedIndex() == 11) {
+                dir = hashTruncamiento(Integer.parseInt(data.get(i)));
+            } else if (cbAlgoritmos.getSelectedIndex() == 6) {
+                dir = hashTransformacionBases(Integer.parseInt(data.get(i)));
+            } else {
+                dir = hashMod(Integer.parseInt(data.get(i)));
+            }
+            estructura += "(" + dir + ", " + data.get(i) + "), ";
         }
         return estructura;
     }
@@ -236,14 +480,14 @@ public class Frame extends JFrame {
         lTitle = new JLabel("Menú principal");
         lTitle.setFont(new Font("Arial", Font.BOLD, 40));
         lTitle.setForeground(Color.WHITE);
-        lTitle.setBounds(400, 32, 700, 50);
+        lTitle.setBounds(300, 32, 800, 50);
         lTitle.setVerticalAlignment(JLabel.CENTER);
         add(lTitle);
     }
 
     private void insertar(String in) {
-        if (in.length() != 4) {
-            JOptionPane.showMessageDialog(null, "Recuerde que la longitud de cada clave es 4");
+        if (in.length() != digitos) {
+            JOptionPane.showMessageDialog(null, "Recuerde que la longitud de cada clave es " + digitos);
             return;
         }
         if (!isInt(in) || Integer.parseInt(in) < 0) {
