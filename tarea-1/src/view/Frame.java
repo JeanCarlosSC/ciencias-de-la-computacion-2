@@ -20,9 +20,11 @@ import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
+import model.Algoritmos;
+
 public class Frame extends JFrame {
-    int n = 100;
-    int digitos = 4;
+    public static int n = 100;
+    public static int digitos = 4;
 
     JLabel lTitle;
     JPanel pContent;
@@ -209,32 +211,52 @@ public class Frame extends JFrame {
                 break;
             }
         } while (true);
+
+        int[] arreglo = new int[data.size()];
+        for (int i = 0; i < arreglo.length; i++) {
+            arreglo[i] = Integer.parseInt(data.get(i));
+        }
+        int valor = Integer.parseInt(value);
+
         switch (option) {
             case 0:
-                return getInternoSecuencial(value);
+                lTitle.setText("Búsqueda interna: Secuencial");
+                return Algoritmos.secuencial(arreglo, valor);
             case 1:
-                return getInternoBinario(value);
+                lTitle.setText("Búsqueda interna Binaria");
+                return Algoritmos.binario(arreglo, valor);
             case 2:
-                return getInternoMod(value);
+                lTitle.setText("Búsqueda interna HASH: Función módulo");
+                return Algoritmos.hashMod(arreglo, valor);
             case 3:
-                return getInternoCuadrado(value);
+                lTitle.setText("Búsqueda interna HASH: Función cuadrada");
+                return Algoritmos.hashCuadrado(arreglo, valor);
             case 4:
+                lTitle.setText("Búsqueda interna HASH: Función plegamiento");
                 return getInternoPlegamiento(value);
             case 5:
+                lTitle.setText("Búsqueda interna HASH: Función truncamiento");
                 return getInternoTruncamiento(value);
             case 6:
+                lTitle.setText("Búsqueda externa HASH: Función transformación de bases");
                 return getInternoTransBases(value);
             case 7:
+                lTitle.setText("Búsqueda externa: Secuencial");
                 return getExtSecuencial(value);
             case 8:
+                lTitle.setText("Búsqueda externa: Binaria");
                 return getExtBinario(value);
             case 9:
+                lTitle.setText("Búsqueda externa HASH: Función cuadrada");
                 return getExtCuadrado(value);
             case 10:
+                lTitle.setText("Búsqueda externa HASH: Función plegamiento");
                 return getExtPlegamiento(value);
             case 11:
+                lTitle.setText("Búsqueda externa HASH: Función truncamiento");
                 return getExtTruncamiento(value);
             case 12:
+                lTitle.setText("Búsqueda externa HASH: Función módulo");
                 return getExtMod(value);
             default:
                 return "No se ha implementado";
