@@ -16,7 +16,6 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
 import control.App;
-import model.Adapter;
 import service.Logic;
 
 public abstract class Frame extends JFrame {
