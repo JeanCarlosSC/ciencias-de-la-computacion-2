@@ -1,6 +1,5 @@
 package control;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 
@@ -40,7 +39,7 @@ public class Estructura {
 
     public void insertarClave(int x) {
         if (!contains(x)) {
-            int direccion = aDir.getDireccion(x, n);
+            int direccion = aDir.getDireccion(x, N);
             Dato d = new Dato(direccion, x, contains(x));
             datos[direccion] = d;
         }

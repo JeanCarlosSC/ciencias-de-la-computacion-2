@@ -56,7 +56,10 @@ public abstract class VDashboard extends JPanel {
         add(lIClave);
 
         JTextField tfB = ObjGraficos.getTextField(838, 212);
-        tfB.addActionListener(e -> buscar(tfB.getText()));
+        tfB.addActionListener(e -> {
+            buscar(tfB.getText());
+            tfB.setText("");
+        });
         add(tfB);
 
         JTextField tfI = ObjGraficos.getTextField(838, 287);
