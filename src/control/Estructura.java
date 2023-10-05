@@ -34,7 +34,7 @@ public class Estructura {
             }
             switch (busqueda) {
                 case 0:
-                    aBus = new BusquedaInterna();
+                    aBus = new BusquedaInterna(busqueda);
                     break;
             }
         }
@@ -71,7 +71,13 @@ public class Estructura {
     }
 
     public Dato buscarClave(int clave) {
-        return null;
+        try {
+            return aBus.buscar(this, clave);
+        }
+        catch(Exception e) {
+            System.err.println(e.getMessage());
+            return null;
+        }
     }
 
 }

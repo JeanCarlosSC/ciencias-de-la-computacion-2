@@ -60,7 +60,10 @@ public abstract class VDashboard extends JPanel {
         add(tfB);
 
         JTextField tfI = ObjGraficos.getTextField(838, 287);
-        tfI.addActionListener(e -> insertar(tfI.getText()));
+        tfI.addActionListener(e -> {
+            insertar(tfI.getText());
+            tfI.setText("");
+        });
         add(tfI);
 
         JButton bSettings = ObjGraficos.getButton(787, 454, "Ajustes");

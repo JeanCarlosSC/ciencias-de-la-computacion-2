@@ -4,6 +4,17 @@ import control.Estructura;
 import model.Dato;
 
 public abstract class AlgoritmoBusqueda {
+    int type;
+    public AlgoritmoBusqueda(int type) {
+        this.type = type;
+    }
+
+    public Dato buscar(Estructura estructura, int clave) throws AlgoritmoException {
+        switch(type) {
+            default:
+                return secuencial(estructura, clave);
+        }
+    }
     public Dato binario(Estructura estructura, int x) throws AlgoritmoException {
         throw new AlgoritmoException("Not implemented yet");
     }
