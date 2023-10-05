@@ -11,8 +11,10 @@ public abstract class AlgoritmoBusqueda {
 
     public Dato buscar(Estructura estructura, int clave) throws AlgoritmoException {
         switch(type) {
-            default:
+            case 0:
                 return secuencial(estructura, clave);
+            default:
+                return binario(estructura, clave);
         }
     }
     public Dato binario(Estructura estructura, int x) throws AlgoritmoException {

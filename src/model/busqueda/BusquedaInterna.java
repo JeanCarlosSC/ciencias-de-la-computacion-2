@@ -1,5 +1,8 @@
 package model.busqueda;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+
 import control.Estructura;
 import model.Dato;
 
@@ -10,7 +13,36 @@ public class BusquedaInterna extends AlgoritmoBusqueda {
 
     @Override
     public Dato binario(Estructura estructura, int x) throws AlgoritmoException {
-        throw new AlgoritmoException("Not implemented yet");
+        // carga claves en array list
+        Dato[] v = estructura.getDatos();
+        ArrayList array = new ArrayList<Integer>();
+        int c = 0;
+        for (Dato dato : v) {
+            if(dato!=null) {
+                array.add(dato.clave);
+                c++;
+            }
+        }
+        if(c == 0) {
+            return null;
+        }
+
+        // carga array list en lista
+        int[] lista = new int[c];
+        for (int i=0; i<array.size(); i++) {
+            lista[i] = (int) array.get(i);
+        }
+        Arrays.sort(lista);
+
+        // asigna nuevas direcciones a las claves
+        for (int i=0; i<lista.length; i++) {
+            Dato d = secuencial(estructura, lista[i]);
+            if(d != null) {
+                d.direccion = i;
+            }
+        }
+
+        return secuencial(estructura, x);
     }
 
     @Override

@@ -148,6 +148,11 @@ public abstract class Frame extends JFrame {
                     setContentPane(vDashboard);
                 }
             }
+
+            @Override
+            public void gotoMenu() {
+                setContentPane(vWelcome);
+            }
         };
 
         setSize(1280, 720);

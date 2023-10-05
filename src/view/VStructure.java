@@ -122,6 +122,10 @@ public abstract class VStructure extends JPanel {
                 cbDir.getSelectedIndex(), cbBusqueda.getSelectedIndex(), cbColision.getSelectedIndex()));
         add(bGuardar);
 
+        JButton bEliminar = ObjGraficos.getButton(x + 300, 322 + y, "Eliminar");
+        bEliminar.addActionListener(e -> gotoMenu());
+        add(bEliminar);
+
         cbTipo.addActionListener(e -> {
 
             if (cbTipo.getSelectedIndex() == 1) {
@@ -151,6 +155,8 @@ public abstract class VStructure extends JPanel {
             }
         });
     }
+
+    public abstract void gotoMenu();
 
     public abstract void bGuardar(String rango, String size, String digitos, int tipo, int direccion, int busqueda,
             int colision);
