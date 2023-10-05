@@ -2,13 +2,8 @@ package view;
 
 import java.awt.Color;
 import java.awt.Font;
-import java.awt.RenderingHints.Key;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
-import java.awt.event.MouseAdapter;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.LinkedList;
 import java.util.Vector;
 
 import javax.swing.JButton;
@@ -20,11 +15,14 @@ import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
-import model.Algoritmos;
+import control.App;
+import model.Adapter;
+import service.Logic;
 
-public class Frame extends JFrame {
-    public static int n = 100;
-    public static int digitos = 4;
+public abstract class Frame extends JFrame {
+    private VWelcome vWelcome;
+    private VStructure vStructure;
+    private VDashboard vDashboard;
 
     JLabel lTitle;
     JPanel pContent;
@@ -34,18 +32,124 @@ public class Frame extends JFrame {
     Font text = new Font("Arial", Font.PLAIN, 20);
     JComboBox cbAlgoritmos;
 
-    public Frame() {
-        data = new ArrayList<String>();
-        pContent = new JPanel();
-        pContent.setBounds(200, 100, 850, 500);
-        pContent.setBackground(Color.WHITE);
-        pContent.setLayout(null);
-        add(pContent);
+    public Frame(App app) {
+        vWelcome = new VWelcome() {
+            @Override
+            public void bCrear() {
+                vStructure.newStructureScreen();
+                setContentPane(vStructure);
+            }
+        };
+        setContentPane(vWelcome);
 
-        loadJLabels();
-        showIntro();
+        vStructure = new VStructure() {
+            @Override
+            public void bGuardar(String rango, String size, String caracteres, int tipo, int direccion, int busqueda,
+                    int colision) {
+                // Validar rango
+                if(rango.isEmpty() || !Logic.isInt(rango) || Integer.parseInt(rango)<100 || Integer.parseInt(rango)>1000) {
+                    JOptionPane.showMessageDialog(
+                        null,
+                        "El rango debe ser un número entero positivo mayor o igual a 100 y menor o igual que 1000",
+                        "Error",
+                        JOptionPane.ERROR_MESSAGE
+                    );
+                }
+                
+                // Validar tamaño
+                else if(size.isEmpty() || !Logic.isInt(size) || Integer.parseInt(size)>Integer.parseInt(rango)) {
+                    JOptionPane.showMessageDialog(
+                        null,
+                        "El tamaño debe ser un número entero positivo menor o igual al rango",
+                        "Error",
+                        JOptionPane.ERROR_MESSAGE
+                    );
+                }
+                
+                // Validar caracteres
+                else if(caracteres.isEmpty() || !Logic.isInt(caracteres) || Integer.parseInt(caracteres)<4 || 
+                        Integer.parseInt(caracteres)>9) {
+                    JOptionPane.showMessageDialog(
+                        null,
+                        "La cantidad de caracteres debe ser un número entero positivo mayor que 3 y menor que 10",
+                        "Error",
+                        JOptionPane.ERROR_MESSAGE
+                    );
+                }
 
-        getContentPane().setBackground(new Color(32, 32, 32));
+                // Validar tipo
+                else if(tipo == 1 && Integer.parseInt(size)<100) {
+                    JOptionPane.showMessageDialog(
+                        null,
+                        "El tamaño de una estructura externa debe ser un número entero positivo mayor o igual a 100",
+                        "Error",
+                        JOptionPane.ERROR_MESSAGE
+                    );
+                }
+
+                // Guardar
+                else {
+                    JOptionPane.showMessageDialog(
+                        null,
+                        "La estructura de datos ha sido guardada satisfactoriamente",
+                        "Mensaje informativo",
+                        JOptionPane.INFORMATION_MESSAGE
+                    );
+                    vStructure.setCreated();
+                    guardarEstructura(
+                        Integer.parseInt(rango),
+                        Integer.parseInt(size),
+                        Integer.parseInt(caracteres),
+                        tipo,
+                        direccion,
+                        busqueda,
+                        colision
+                    );
+                    vDashboard = new VDashboard() {
+                        @Override
+                        public void settings() {
+                            setContentPane(vStructure);
+                        }
+
+                        @Override
+                        public void insertar(String clave) {
+                            if(clave.isEmpty() || !Logic.isInt(clave) || clave.length()!=app.getDigitos() || Integer.parseInt(clave)<0) {
+                                JOptionPane.showMessageDialog(
+                                    null,
+                                    "La clave debe ser un número entero positivo de "+app.getDigitos()+" dígitos",
+                                    "Error",
+                                    JOptionPane.ERROR_MESSAGE
+                                );
+                            }
+                            else {
+                                app.insertar(Integer.parseInt(clave));
+                                vDashboard.refrescar(app.getDatos(), app.getDigitos());
+                            }
+                        }
+
+                        @Override
+                        public void buscar(String clave) {
+                            if(clave.isEmpty() || !Logic.isInt(clave) || clave.length()!=app.getDigitos() || Integer.parseInt(clave)<0) {
+                                JOptionPane.showMessageDialog(
+                                    null,
+                                    "La clave debe ser un número entero positivo de "+app.getDigitos()+" dígitos",
+                                    "Error",
+                                    JOptionPane.ERROR_MESSAGE
+                                );
+                            }
+                            else {
+                                app.buscar(Integer.parseInt(clave));
+                                vDashboard.refrescar(app.getDatos(), app.getDigitos());
+                            }
+                        }
+
+                    };
+                    vDashboard.refrescar(app.getDatos(), app.getDigitos());
+                    setContentPane(vDashboard);
+                }
+            }
+        };
+
         setSize(1280, 720);
         setLayout(null);
         setLocationRelativeTo(null);
@@ -53,6 +157,17 @@ public class Frame extends JFrame {
         setVisible(true);
     }
 
+    public abstract void guardarEstructura(
+        int rango,
+        int tamanio,
+        int caracteres,
+        int tipo,
+        int direccion,
+        int busqueda,
+        int colision
+    );
+
+/* 
     private void showIntro() {
         lTitle.setText("Menú principal");
         if (p1 == null) {
@@ -96,7 +211,7 @@ public class Frame extends JFrame {
             JButton bExecute = new JButton("Ejecutar");
             bExecute.setBounds(600, 150, 150, 32);
             bExecute.addActionListener(e -> {
-                if (!hayDatos()) {
+                if (!true/*hayDatos()) {
                     showDatos();
                 } else {
                     // add modify option here
@@ -118,7 +233,7 @@ public class Frame extends JFrame {
             p2.setLayout(null);
             p2.setBounds(0, 0, 850, 500);
 
-            JLabel lP1 = new JLabel("Ingrese clave (" + digitos + " caracteres numéricos)");
+            JLabel lP1 = new JLabel("Ingrese clave (" + App.DIGITOS + " caracteres numéricos)");
             lP1.setBounds(32, 32, 400, 30);
             lP1.setFont(text);
             p2.add(lP1);
@@ -198,15 +313,15 @@ public class Frame extends JFrame {
         }
         return str;
     }
-
+/* 
     private String getAnswer() {
         String value = "";
         int option = cbAlgoritmos.getSelectedIndex();
         do {
             value = JOptionPane.showInputDialog("Inserte la clave que desea buscar");
-            if (value != null && (value.length() != digitos || !isInt(value) || Integer.parseInt(value) < 0)) {
+            if (value != null && (value.length() != App.DIGITOS || !App.isInt(value) || Integer.parseInt(value) < 0)) {
                 JOptionPane.showMessageDialog(null,
-                        "Por favor busque una clave numérica entera positiva con " + digitos + " caracteres");
+                        "Por favor busque una clave numérica entera positiva con " + App.DIGITOS + " caracteres");
             } else {
                 break;
             }
@@ -220,43 +335,43 @@ public class Frame extends JFrame {
 
         switch (option) {
             case 0:
-                lTitle.setText("Búsqueda interna: Secuencial");
-                return Algoritmos.secuencial(arreglo, valor);
+                lTitle.setText("B. interna: Secuencial");
+                return Adapter.secuencial(arreglo, valor);
             case 1:
-                lTitle.setText("Búsqueda interna Binaria");
-                return Algoritmos.binario(arreglo, valor);
+                lTitle.setText("B. interna Binaria");
+                return Adapter.binario(arreglo, valor);
             case 2:
-                lTitle.setText("Búsqueda interna HASH: Función módulo");
-                return Algoritmos.hashMod(arreglo, valor);
+                lTitle.setText("B. interna HASH: Función módulo");
+                return Adapter.hashMod(arreglo, valor);
             case 3:
-                lTitle.setText("Búsqueda interna HASH: Función cuadrada");
-                return Algoritmos.hashCuadrado(arreglo, valor);
+                lTitle.setText("B. interna HASH: Función cuadrada");
+                return Adapter.hashCuadrado(arreglo, valor);
             case 4:
-                lTitle.setText("Búsqueda interna HASH: Función plegamiento");
+                lTitle.setText("B. interna HASH: Función plegamiento");
                 return getInternoPlegamiento(value);
             case 5:
-                lTitle.setText("Búsqueda interna HASH: Función truncamiento");
+                lTitle.setText("B. interna HASH: Función truncamiento");
                 return getInternoTruncamiento(value);
             case 6:
-                lTitle.setText("Búsqueda externa HASH: Función transformación de bases");
+                lTitle.setText("B. externa HASH: Función transformación de bases");
                 return getInternoTransBases(value);
             case 7:
-                lTitle.setText("Búsqueda externa: Secuencial");
+                lTitle.setText("B. externa: Secuencial");
                 return getExtSecuencial(value);
             case 8:
-                lTitle.setText("Búsqueda externa: Binaria");
+                lTitle.setText("B. externa: Binaria");
                 return getExtBinario(value);
             case 9:
-                lTitle.setText("Búsqueda externa HASH: Función cuadrada");
+                lTitle.setText("B. externa HASH: Función cuadrada");
                 return getExtCuadrado(value);
             case 10:
-                lTitle.setText("Búsqueda externa HASH: Función plegamiento");
+                lTitle.setText("B. externa HASH: Función plegamiento");
                 return getExtPlegamiento(value);
             case 11:
-                lTitle.setText("Búsqueda externa HASH: Función truncamiento");
+                lTitle.setText("B. externa HASH: Función truncamiento");
                 return getExtTruncamiento(value);
             case 12:
-                lTitle.setText("Búsqueda externa HASH: Función módulo");
+                lTitle.setText("B. externa HASH: Función módulo");
                 return getExtMod(value);
             default:
                 return "No se ha implementado";
@@ -353,7 +468,7 @@ public class Frame extends JFrame {
         String valorBase7 = Integer.toString(valor, 7);
 
         // Tomar el módulo del valor convertido para obtener el índice
-        int indice = Integer.parseInt(valorBase7) % n;
+        int indice = Integer.parseInt(valorBase7) % App.N;
 
         return indice;
 
@@ -376,7 +491,7 @@ public class Frame extends JFrame {
         int digitos = valor % 100;
 
         // Tomar el módulo del resultado para obtener el índice
-        int indice = digitos % n;
+        int indice = digitos % App.N;
 
         return indice;
     }
@@ -404,45 +519,21 @@ public class Frame extends JFrame {
         }
 
         // Tomar el módulo del resultado
-        int indice = sumaPartes % n;
+        int indice = sumaPartes % App.N;
 
         return indice;
-    }
-
-    private String getInternoCuadrado(String clave) {
-        lTitle.setText("Búsqueda interna HASH: F. cuadrado");
-        int ans = bInternoBinario(Integer.parseInt(clave));
-        if (ans < 0) {
-            return "No se encontró la clave " + clave + " en la estructura" + getEstructura();
-        } else {
-            return "Se encontró la clave " + clave + " en la dirección " + hashCuadrado(Integer.parseInt(clave), 0)
-                    + " de la estructura"
-                    + getEstructura();
-        }
     }
 
     private int hashCuadrado(int valor, int intento) {
-        int hash1 = valor % n;
-        int hash2 = 1 + (valor % (n - 1)); // Asegura que sea impar para evitar ciclos infinitos
-        int indice = (hash1 + intento * hash2) % n;
+        int hash1 = valor % App.N;
+        int hash2 = 1 + (valor % (App.N - 1)); // Asegura que sea impar para evitar ciclos infinitos
+        int indice = (hash1 + intento * hash2) % App.N;
 
         return indice;
     }
 
-    private String getInternoMod(String clave) {
-        lTitle.setText("Búsqueda interna HASH: F. módulo");
-        int ans = bInternoBinario(Integer.parseInt(clave));
-        if (ans < 0) {
-            return "No se encontró la clave " + clave + " en la estructura" + getEstructura();
-        } else {
-            return "Se encontró la clave " + clave + " en la dirección " + hashMod(Integer.parseInt(clave))
-                    + " de la estructura"
-                    + getEstructura();
-        }
-    }
-
     private int hashMod(int clave) {
-        return clave % n + 1;
+        return clave % App.N + 1;
     }
 
     private String getInternoBinario(String clave) {
@@ -508,8 +599,8 @@ public class Frame extends JFrame {
     }
 
     private void insertar(String in) {
-        if (in.length() != digitos) {
-            JOptionPane.showMessageDialog(null, "Recuerde que la longitud de cada clave es " + digitos);
+        if (in.length() != App.DIGITOS) {
+            JOptionPane.showMessageDialog(null, "Recuerde que la longitud de cada clave es " + App.DIGITOS);
             return;
         }
         if (!isInt(in) || Integer.parseInt(in) < 0) {
@@ -522,17 +613,5 @@ public class Frame extends JFrame {
         }
         data.add(in);
     }
-
-    public static Boolean isInt(String string) {
-        try {
-            Integer.parseInt(string);
-            return true;
-        } catch (NumberFormatException numberFormat) {
-            return false;
-        }
-    }
-
-    private boolean hayDatos() {
-        return data.size() != 0;
-    }
+    */
 }
