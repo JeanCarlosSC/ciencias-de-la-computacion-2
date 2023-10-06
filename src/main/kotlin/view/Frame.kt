@@ -36,7 +36,7 @@ class Frame(app: App) : JFrame() {
                 )
             } else {
                 app.insertar(clave.toInt())
-                refrescar(app.estructura!!.getDatosParaMostrar()!!, app.digitos)
+                refrescar(app.estructura!!.getDatos(), app.digitos)
             }
         }
 
@@ -50,7 +50,7 @@ class Frame(app: App) : JFrame() {
                 )
             } else {
                 app.buscar(clave.toInt())
-                //vDashboard!!.refrescar(app.datos, app.digitos)
+                refrescar(app.estructura!!.getDatos(), app.digitos)
             }
         }
     }

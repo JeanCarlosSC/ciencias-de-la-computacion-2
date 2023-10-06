@@ -72,6 +72,7 @@ abstract class Estructura(
     }
 
     abstract fun getDatosParaMostrar(): MutableList<Dato?>?
+    abstract fun setDatos(newDatos: MutableList<MutableList<Dato?>>)
 }
 
 fun crearEstructura(

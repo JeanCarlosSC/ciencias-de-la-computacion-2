@@ -1,6 +1,8 @@
 package control
 
 import model.Dato
+import model.busqueda.BUSQUEDA_HASH_MOD
+import model.direccion.DirInterna
 import model.estructura.Estructura
 import model.estructura.crearEstructura
 import service.Logic
@@ -23,6 +25,7 @@ class App {
 
     fun buscar(clave: Int) {
         val ans = estructura!!.buscarClave(clave)
+        frame.vDashboard.refrescar(estructura!!.getDatos(), estructura!!.digitos)
         if (ans == null) {
             JOptionPane.showMessageDialog(
                 null,
@@ -110,9 +113,22 @@ class App {
             else {
                 estructura!!.setProperties(dirType, busType, colType)
             }
+
+            if(busType == BUSQUEDA_HASH_MOD) {
+                for (i in estructura!!.getDatos()) {
+                    if(i.size>0) {
+                        var pos = 0
+                        for (j in i) {
+                            //j!!.dir = estructura!!.aDir!!.getDir(j!!.clave, estructura!!.N)+pos
+                            //pos++
+                        }
+                    }
+                }
+                frame.vDashboard.refrescar(estructura!!.getDatos(), digitos)
+            }
             frame.contentPane = frame.vDashboard
             frame.vStructure.setCreated()
-            frame.vDashboard.refrescar(estructura!!.getDatosParaMostrar()!!, digitos)
+            frame.vDashboard.refrescar(estructura!!.getDatos(), digitos)
         }
     }
 }

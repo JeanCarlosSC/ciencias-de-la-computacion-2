@@ -50,6 +50,15 @@ class BusquedaInterna(type: Int) : AlgoritmoBusqueda(type) {
         lista.sortBy { t -> t.clave }
         lista.forEachIndexed { i, dato ->  dato.dir = i}
 
+        val newDatos = mutableListOf<MutableList<Dato?>>()
+        for (i in lista.indices) {
+            val fila = mutableListOf<Dato?>()
+            lista[i].dir = i
+            fila.add(lista[i]);
+            newDatos.add(fila)
+        }
+
+        estructura.setDatos(newDatos)
         return secuencial(estructura, x);
     }
 
@@ -90,11 +99,10 @@ class BusquedaInterna(type: Int) : AlgoritmoBusqueda(type) {
             if(dato != null) {
                 dato.dir = AlgoritmoDireccion.fHashCuadrado(dato.clave, estructura.getRango());
             }
-        }
+        }*/
 
         // busqueda
-        return secuencial(estructura, x);*/
-        return null
+        return secuencial(estructura, x);
     }
 
     override fun hashPlegamiento(estructura: Estructura, x: Int): Dato? {
@@ -113,8 +121,7 @@ class BusquedaInterna(type: Int) : AlgoritmoBusqueda(type) {
 
     override fun hashTruncamiento(estructura: Estructura, x: Int): Dato? {
         // busqueda
-        //return secuencial(estructura, x);
-        return null
+        return secuencial(estructura, x);
     }
 
 }

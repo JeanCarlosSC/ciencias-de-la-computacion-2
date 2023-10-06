@@ -3,6 +3,8 @@ package model.busqueda
 import model.estructura.Estructura
 import model.Dato
 
+val BUSQUEDA_HASH_MOD = 2
+
 abstract class AlgoritmoBusqueda(private var type: Int) {
     @Throws(AlgoritmoException::class)
     fun buscar(estructura: Estructura, clave: Int): Dato? {

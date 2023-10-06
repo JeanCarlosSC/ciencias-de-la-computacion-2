@@ -35,4 +35,8 @@ class EstructuraExterna(
         return null
     }
 
+    override fun setDatos(newDatos: MutableList<MutableList<Dato?>>) {
+        TODO("Not yet implemented")
+    }
+
 }

@@ -41,6 +41,7 @@ abstract class VDashboard : JPanel() {
         lBClave.setBounds(640, 212, 144, 29)
         lBClave.setFont(Recursos.fText)
         add(lBClave)
+
         val lIClave = JLabel("Insertar clave")
         lIClave.setBounds(640, 287, 154, 29)
         lIClave.setFont(Recursos.fText)
@@ -62,7 +63,7 @@ abstract class VDashboard : JPanel() {
         add(bSettings)
     }
 
-    fun refrescar(datos: MutableList<Dato?>, nDigitos: Int) {
+    fun refrescar(datos: MutableList<MutableList<Dato?>>, nDigitos: Int) {
         pEstructura!!.removeAll()
         val lDir = JLabel("Dirección")
         lDir.setBounds(32, 32, 100, 32)
@@ -77,17 +78,21 @@ abstract class VDashboard : JPanel() {
             return
         }
         var y = 0
-        for (i in datos.indices) {
-            if (datos[i] != null) {
-                val lDirA = JLabel(datos[i]!!.dir.toString() + "")
+
+        for (i in datos) {
+            if(i.size>0) {
+                val lDirA = JLabel(i[0]!!.dir.toString() + "")
                 lDirA.setBounds(32, 64 + 32 * y, 100, 32)
                 lDirA.setFont(Recursos.fText)
                 pEstructura!!.add(lDirA)
-                val lClaveA = JLabel(String.format("%0" + nDigitos + "d", datos[i]!!.clave))
-                lClaveA.setBounds(142, 64 + 32 * y, 100, 32)
-                lClaveA.setFont(Recursos.fText)
-                pEstructura!!.add(lClaveA)
-                y++
+
+                for (j in i.indices) {
+                    val lClaveA = JLabel(String.format("%0" + nDigitos + "d", i[j]!!.clave))
+                    lClaveA.setBounds(142+j*100, 64 + 32 * y, 100, 32)
+                    lClaveA.setFont(Recursos.fText)
+                    pEstructura!!.add(lClaveA)
+                    y++
+                }
             }
         }
         repaint()

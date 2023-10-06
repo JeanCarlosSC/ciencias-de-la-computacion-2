@@ -5,12 +5,12 @@ import javax.swing.JOptionPane
 
 class EstructuraInterna(rango: Int, N: Int, digitos: Int, tipo: Int, direccion: Int, busqueda: Int, colision: Int) :
     Estructura(ESTRUCTURA_INTERNA, rango, N, digitos, tipo, direccion, busqueda, colision) {
-    private val datos = MutableList(N) {
+    private var datos = MutableList(N) {
         mutableListOf<Dato?>()
     }
 
     override fun insertarClave(clave: Int) {
-        val dir = aDir!!.getDir(clave, N)
+        var dir = aDir!!.getDir(clave, N)
 
         if(estaClave(clave)) {
             JOptionPane.showMessageDialog(
@@ -29,8 +29,24 @@ class EstructuraInterna(rango: Int, N: Int, digitos: Int, tipo: Int, direccion: 
             )
         }
         else {
-            datos[dir].add(Dato(dir, clave))
-            espaciosOcupados++
+            var limite = false
+            while(true) {
+                if(datos[dir].size==0) {
+                    datos[dir].add(Dato(dir, clave))
+                    espaciosOcupados++
+                    break;
+                }
+                else if(!limite) {
+                    dir++
+                    if(dir >= N) {
+                        dir = 0
+                        limite = true
+                    }
+                }
+                else {
+                    break;
+                }
+            }
         }
     }
 
@@ -67,5 +83,9 @@ class EstructuraInterna(rango: Int, N: Int, digitos: Int, tipo: Int, direccion: 
             }
         }
         return ans
+    }
+
+    override fun setDatos(newDatos: MutableList<MutableList<Dato?>>)  {
+        datos = newDatos
     }
 }
