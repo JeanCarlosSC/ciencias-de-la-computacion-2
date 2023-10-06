@@ -123,7 +123,7 @@ abstract class VStructure : JPanel() {
 
         cbColision = JComboBox(vColision)
         cbColision!!.setBounds(x + 550, 272 + y, 300, 32)
-        add(cbColision)
+        //add(cbColision)
     }
 
     private fun loadLabels() {
@@ -169,7 +169,7 @@ abstract class VStructure : JPanel() {
         val lColision = JLabel("Algoritmo para solucionar colisión de datos en memoria")
         lColision.setBounds(x, 272 + y, 500, 32)
         lColision.setFont(Recursos.fText)
-        add(lColision)
+        //add(lColision)
     }
 
     fun setCreated() {

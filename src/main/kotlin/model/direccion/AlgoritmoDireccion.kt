@@ -15,9 +15,9 @@ abstract class AlgoritmoDireccion(private var type: Int) {
     fun getDir(x: Int, N: Int): Int {
         return when (type) {
             DIRECCION_HASH_MOD -> hashMod(x, N)
-            DIRECCION_HASH_CUADRADO -> hashMod(x, N)
-            DIRECCION_HASH_PLEGAMIENTO -> hashMod(x, N)
-            DIRECCION_HASH_TRUNCAMIENTO -> hashMod(x, N)
+            DIRECCION_HASH_CUADRADO -> hashCuadrado(x, N)
+            DIRECCION_HASH_PLEGAMIENTO -> hashPlegamiento(x, N)
+            DIRECCION_HASH_TRUNCAMIENTO -> hashTruncamiento(x, N)
             else -> -1
         }
     }
